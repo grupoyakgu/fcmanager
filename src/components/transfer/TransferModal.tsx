@@ -8,6 +8,7 @@ import { getAskingPrice } from "@/game/engines/transferEngine";
 import { formatCurrency, formatCurrencyPrecise } from "@/lib/formatCurrency";
 import { flagFor } from "@/data/nameData";
 import { OfferOutcome } from "@/game/engines/transferEngine";
+import { useTranslation } from "@/i18n/useTranslation";
 
 interface OfferResultState {
   outcome: OfferOutcome;
@@ -26,6 +27,7 @@ export default function TransferModal() {
 
   const [amount, setAmount] = useState<string>("");
   const [result, setResult] = useState<OfferResultState | null>(null);
+  const { t } = useTranslation();
 
   if (!offerPlayerId || !player || !club) return null;
   const askingPrice = getAskingPrice(player);
@@ -56,7 +58,7 @@ export default function TransferModal() {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-fw-border px-5 py-4">
-          <h2 className="font-display text-sm font-bold uppercase tracking-wide text-fw-text">Make Transfer Offer</h2>
+          <h2 className="font-display text-sm font-bold uppercase tracking-wide text-fw-text">{t("offer.title")}</h2>
           <button onClick={close} className="rounded-lg p-1.5 text-fw-text-faint hover:bg-fw-surface-hover hover:text-fw-text">
             <X className="h-4 w-4" />
           </button>
@@ -64,20 +66,20 @@ export default function TransferModal() {
 
         <div className="p-5">
           <p className="font-display text-xl font-bold uppercase text-fw-text">
-            {player.firstName} {player.lastName} <span className="ml-1">{flagFor(player.nationality)}</span>
+            {player.firstName} {player.lastName} <span className="ms-1">{flagFor(player.nationality)}</span>
           </p>
           <p className="text-xs font-semibold uppercase tracking-wide text-fw-text-faint">
             {player.position} &middot; {player.age} &middot; OVR {player.overallRating}
           </p>
 
           <div className="mt-4 rounded-lg border border-fw-border bg-fw-surface p-3.5">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">Asking Price</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{t("offer.askingPrice")}</p>
             <p className="font-display text-2xl font-bold text-fw-text">{formatCurrency(askingPrice)}</p>
           </div>
 
           {!result && (
             <div className="mt-4">
-              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">Your Offer</label>
+              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{t("offer.yourOffer")}</label>
               <div className="flex items-center gap-2 rounded-lg border border-fw-border bg-fw-surface px-3.5 py-3 focus-within:border-fw-accent">
                 <span className="font-display text-lg font-bold text-fw-text-faint">€</span>
                 <input
@@ -88,14 +90,16 @@ export default function TransferModal() {
                   className="w-full bg-transparent font-display text-lg font-bold tabular-nums text-fw-text outline-none placeholder:font-normal placeholder:text-fw-text-faint"
                 />
               </div>
-              <p className="mt-1.5 text-[11px] text-fw-text-faint">Available cash: {formatCurrencyPrecise(club.budget)}</p>
+              <p className="mt-1.5 text-[11px] text-fw-text-faint">
+                {t("offer.availableCash", { amount: formatCurrencyPrecise(club.budget) })}
+              </p>
 
               <button
                 onClick={submitOffer}
                 disabled={!amount || Number(amount) <= 0 || Number(amount) > club.budget}
                 className="mt-4 w-full rounded-lg bg-fw-accent px-4 py-3 font-display text-sm font-bold uppercase tracking-wider text-fw-accent-fg disabled:opacity-40"
               >
-                Make Offer
+                {t("offer.makeOffer")}
               </button>
             </div>
           )}
@@ -105,37 +109,37 @@ export default function TransferModal() {
               {result.outcome === "ACCEPTED" && (
                 <>
                   <CheckCircle2 className="h-8 w-8 text-fw-positive" />
-                  <p className="font-display text-lg font-bold uppercase text-fw-positive">Offer Accepted</p>
+                  <p className="font-display text-lg font-bold uppercase text-fw-positive">{t("offer.accepted")}</p>
                   <p className="text-xs text-fw-text-dim">
-                    {player.firstName} {player.lastName} has signed for {club.name}.
+                    {t("offer.acceptedMsg", { player: `${player.firstName} ${player.lastName}`, club: club.name })}
                   </p>
                 </>
               )}
               {result.outcome === "CLUB_WANTS_MORE" && (
                 <>
                   <MessageCircleWarning className="h-8 w-8 text-fw-amber" />
-                  <p className="font-display text-lg font-bold uppercase text-fw-amber">Club Wants More</p>
+                  <p className="font-display text-lg font-bold uppercase text-fw-amber">{t("offer.wantsMore")}</p>
                   <p className="text-xs text-fw-text-dim">
-                    They will accept {formatCurrency(result.counterOffer ?? askingPrice)}.
+                    {t("offer.wantsMoreMsg", { amount: formatCurrency(result.counterOffer ?? askingPrice) })}
                   </p>
                   <button
                     onClick={acceptCounter}
                     disabled={(result.counterOffer ?? 0) > club.budget}
                     className="mt-2 w-full rounded-lg bg-fw-accent px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-fw-accent-fg disabled:opacity-40"
                   >
-                    Accept {formatCurrency(result.counterOffer ?? 0)}
+                    {t("offer.acceptCounter", { amount: formatCurrency(result.counterOffer ?? 0) })}
                   </button>
                 </>
               )}
               {result.outcome === "REJECTED" && (
                 <>
                   <XCircle className="h-8 w-8 text-fw-negative" />
-                  <p className="font-display text-lg font-bold uppercase text-fw-negative">Offer Rejected</p>
-                  <p className="text-xs text-fw-text-dim">The asking club felt the offer fell well short of value.</p>
+                  <p className="font-display text-lg font-bold uppercase text-fw-negative">{t("offer.rejected")}</p>
+                  <p className="text-xs text-fw-text-dim">{t("offer.rejectedMsg")}</p>
                 </>
               )}
               <button onClick={close} className="mt-3 text-xs font-semibold uppercase tracking-wide text-fw-text-faint hover:text-fw-text">
-                Close
+                {t("common.close")}
               </button>
             </div>
           )}

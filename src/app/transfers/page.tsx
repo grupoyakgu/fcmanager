@@ -11,6 +11,7 @@ import { formatCurrency } from "@/lib/formatCurrency";
 import { NATIONALITIES } from "@/data/nameData";
 import { Player, Position } from "@/types";
 import { SlidersHorizontal, Search } from "lucide-react";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const POSITIONS: (Position | "ALL")[] = ["ALL", "GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LW", "RW", "ST"];
 
@@ -19,6 +20,7 @@ export default function TransfersPage() {
   const players = useGameStore((s) => s.players);
   const marketMovements = useGameStore((s) => s.marketMovements);
   const currentWeek = useGameStore((s) => s.currentWeek);
+  const { t } = useTranslation();
 
   const [position, setPosition] = useState<Position | "ALL">("ALL");
   const [maxAge, setMaxAge] = useState(40);
@@ -61,25 +63,25 @@ export default function TransfersPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-fw-border pb-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">Global Premier League</p>
-          <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">Transfer Market</h1>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">{t("transfers.eyebrow")}</p>
+          <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">{t("transfers.title")}</h1>
         </div>
-        <MoneyDisplay value={club.budget} label="Available Cash" size="lg" />
+        <MoneyDisplay value={club.budget} label={t("transfers.availableCash")} size="lg" />
       </div>
 
       <div className="rounded-xl border border-fw-border bg-fw-surface p-4">
         <div className="mb-3 flex items-center gap-2 text-fw-text-dim">
           <SlidersHorizontal className="h-4 w-4" />
-          <p className="text-xs font-bold uppercase tracking-wide">Filters</p>
+          <p className="text-xs font-bold uppercase tracking-wide">{t("transfers.filters")}</p>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <div className="relative col-span-2 sm:col-span-3 lg:col-span-1">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-fw-text-faint" />
+            <Search className="pointer-events-none absolute start-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-fw-text-faint" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search player"
-              className="w-full rounded-lg border border-fw-border bg-fw-bg py-2 pl-8 pr-2 text-xs text-fw-text outline-none focus:border-fw-accent"
+              placeholder={t("transfers.searchPlaceholder")}
+              className="w-full rounded-lg border border-fw-border bg-fw-bg py-2 ps-8 pe-2 text-xs text-fw-text outline-none focus:border-fw-accent"
             />
           </div>
           <select
@@ -89,7 +91,7 @@ export default function TransfersPage() {
           >
             {POSITIONS.map((p) => (
               <option key={p} value={p}>
-                {p === "ALL" ? "All Positions" : p}
+                {p === "ALL" ? t("transfers.allPositions") : p}
               </option>
             ))}
           </select>
@@ -98,7 +100,7 @@ export default function TransfersPage() {
             onChange={(e) => setNationality(e.target.value)}
             className="rounded-lg border border-fw-border bg-fw-bg px-2 py-2 text-xs text-fw-text outline-none focus:border-fw-accent"
           >
-            <option value="ALL">All Nations</option>
+            <option value="ALL">{t("transfers.allNations")}</option>
             {NATIONALITIES.map((n) => (
               <option key={n.country} value={n.country}>
                 {n.country}
@@ -106,7 +108,7 @@ export default function TransfersPage() {
             ))}
           </select>
           <label className="flex items-center gap-2 text-xs text-fw-text-dim">
-            Max Age
+            {t("transfers.maxAge")}
             <input
               type="range"
               min={16}
@@ -115,10 +117,10 @@ export default function TransfersPage() {
               onChange={(e) => setMaxAge(Number(e.target.value))}
               className="flex-1 accent-fw-accent"
             />
-            <span className="w-6 text-right tabular-nums text-fw-text">{maxAge}</span>
+            <span className="w-6 text-end tabular-nums text-fw-text">{maxAge}</span>
           </label>
           <label className="flex items-center gap-2 text-xs text-fw-text-dim">
-            Min OVR
+            {t("transfers.minOvr")}
             <input
               type="range"
               min={0}
@@ -127,10 +129,10 @@ export default function TransfersPage() {
               onChange={(e) => setMinOverall(Number(e.target.value))}
               className="flex-1 accent-fw-accent"
             />
-            <span className="w-6 text-right tabular-nums text-fw-text">{minOverall}</span>
+            <span className="w-6 text-end tabular-nums text-fw-text">{minOverall}</span>
           </label>
           <label className="flex items-center gap-2 text-xs text-fw-text-dim">
-            Max Price
+            {t("transfers.maxPrice")}
             <input
               type="range"
               min={100_000}
@@ -140,19 +142,19 @@ export default function TransfersPage() {
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="flex-1 accent-fw-accent"
             />
-            <span className="w-12 text-right tabular-nums text-fw-text">{formatCurrency(maxPrice)}</span>
+            <span className="w-12 text-end tabular-nums text-fw-text">{formatCurrency(maxPrice)}</span>
           </label>
         </div>
         <label className="mt-3 flex w-fit items-center gap-2 text-xs font-semibold text-fw-text-dim">
           <input type="checkbox" checked={talentOnly} onChange={(e) => setTalentOnly(e.target.checked)} className="accent-fw-accent" />
-          Talent only (21 & under)
+          {t("transfers.talentOnly")}
         </label>
       </div>
 
-      <MarketSection title="Featured Targets" eyebrow="Editor's Picks" players={featured} emptyMessage="No players match your filters right now." />
-      <MarketSection title="Young Talents" eyebrow="Future Stars" players={youngTalents} emptyMessage="No young talents match your filters." />
-      <MarketSection title="Market Movers" eyebrow="This Week" players={marketMovers} emptyMessage="No significant value changes this week." />
-      <MarketSection title="Recently Listed" eyebrow="Fresh Availability" players={recentlyListed} emptyMessage="No listings match your filters." />
+      <MarketSection title={t("transfers.featured")} eyebrow={t("transfers.featuredEyebrow")} players={featured} emptyMessage={t("transfers.noPlayersFilters")} />
+      <MarketSection title={t("transfers.young")} eyebrow={t("transfers.youngEyebrow")} players={youngTalents} emptyMessage={t("transfers.noYoungFilters")} />
+      <MarketSection title={t("transfers.movers")} eyebrow={t("transfers.moversEyebrow")} players={marketMovers} emptyMessage={t("transfers.noMoversFilters")} />
+      <MarketSection title={t("transfers.listed")} eyebrow={t("transfers.listedEyebrow")} players={recentlyListed} emptyMessage={t("transfers.noListedFilters")} />
     </div>
   );
 }
@@ -168,11 +170,12 @@ function MarketSection({
   players: Player[];
   emptyMessage: string;
 }) {
+  const { t } = useTranslation();
   return (
     <section>
       <SectionHeader eyebrow={eyebrow} title={title} />
       {players.length === 0 ? (
-        <EmptyState title="NO PLAYERS FOUND" message={emptyMessage} />
+        <EmptyState title={t("transfers.noPlayersTitle")} message={emptyMessage} />
       ) : (
         <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1">
           {players.map((p) => (

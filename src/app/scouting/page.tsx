@@ -8,10 +8,12 @@ import ScoutCard from "@/components/scouting/ScoutCard";
 import EmptyState from "@/components/ui/EmptyState";
 import { getRecommendedPlayers, getHiddenGems, getWonderkids } from "@/lib/getRecommendedPlayers";
 import { FileSearch } from "lucide-react";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function ScoutingPage() {
   const players = useGameStore((s) => s.players);
   const scoutReports = useGameStore((s) => s.scoutReports);
+  const { t } = useTranslation();
 
   const mySquad = players.filter((p) => p.clubId === USER_CLUB_ID);
   const recommended = getRecommendedPlayers(players, mySquad, USER_CLUB_ID, 6);
@@ -27,19 +29,19 @@ export default function ScoutingPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="border-b border-fw-border pb-5">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">Scouting Department</p>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">Scouting</h1>
-        <p className="mt-1 text-sm text-fw-text-dim">{assignments} assignment{assignments !== 1 ? "s" : ""} available</p>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">{t("scouting.eyebrow")}</p>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">{t("scouting.title")}</h1>
+        <p className="mt-1 text-sm text-fw-text-dim">{t("scouting.assignments", { n: assignments })}</p>
       </div>
 
-      <ScoutSection title="Recommended" eyebrow="For Your Squad" players={recommended} emptyMessage="Your squad already covers every position well." />
-      <ScoutSection title="Hidden Gems" eyebrow="Undervalued" players={hiddenGems} emptyMessage="No undervalued gems have been identified yet." />
-      <ScoutSection title="Wonderkids" eyebrow="Elite Prospects" players={wonderkids} emptyMessage="No elite young prospects available right now." />
+      <ScoutSection title={t("scouting.recommended")} eyebrow={t("scouting.recommendedEyebrow")} players={recommended} emptyMessage={t("scouting.recommendedEmpty")} />
+      <ScoutSection title={t("scouting.gems")} eyebrow={t("scouting.gemsEyebrow")} players={hiddenGems} emptyMessage={t("scouting.gemsEmpty")} />
+      <ScoutSection title={t("scouting.wonderkids")} eyebrow={t("scouting.wonderkidsEyebrow")} players={wonderkids} emptyMessage={t("scouting.wonderkidsEmpty")} />
 
       <section>
-        <SectionHeader eyebrow="Your Scouts" title="Recent Reports" />
+        <SectionHeader eyebrow={t("scouting.yourScouts")} title={t("scouting.recentReports")} />
         {recentReports.length === 0 ? (
-          <EmptyState icon={FileSearch} title="NO REPORTS READY" message="Your scouts are waiting for their next assignment." />
+          <EmptyState icon={FileSearch} title={t("scouting.noReportsTitle")} message={t("scouting.noReportsMsg")} />
         ) : (
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {recentReports.map((p) => (
@@ -63,11 +65,12 @@ function ScoutSection({
   players: Player[];
   emptyMessage: string;
 }) {
+  const { t } = useTranslation();
   return (
     <section>
       <SectionHeader eyebrow={eyebrow} title={title} />
       {players.length === 0 ? (
-        <EmptyState title="NO PLAYERS FOUND" message={emptyMessage} />
+        <EmptyState title={t("scouting.noPlayersFound")} message={emptyMessage} />
       ) : (
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {players.map((p) => (

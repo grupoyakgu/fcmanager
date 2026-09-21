@@ -8,21 +8,23 @@ import Pill from "@/components/ui/Pill";
 import { Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NewsCategory } from "@/types";
+import { useTranslation } from "@/i18n/useTranslation";
 
-const CATEGORIES: { value: NewsCategory | "ALL"; label: string }[] = [
-  { value: "ALL", label: "All" },
-  { value: "TRANSFER", label: "Transfer" },
-  { value: "MATCH_REPORT", label: "Match Report" },
-  { value: "WONDERKID_WATCH", label: "Wonderkid Watch" },
-  { value: "MARKET_MOVERS", label: "Market Movers" },
-  { value: "YOUR_CLUB", label: "Your Club" },
-  { value: "LEAGUE_NEWS", label: "League News" },
-  { value: "FINANCE", label: "Finance" },
+const CATEGORY_VALUES: (NewsCategory | "ALL")[] = [
+  "ALL",
+  "TRANSFER",
+  "MATCH_REPORT",
+  "WONDERKID_WATCH",
+  "MARKET_MOVERS",
+  "YOUR_CLUB",
+  "LEAGUE_NEWS",
+  "FINANCE",
 ];
 
 export default function NewsPage() {
   const news = useGameStore((s) => s.news);
   const [category, setCategory] = useState<NewsCategory | "ALL">("ALL");
+  const { t } = useTranslation();
 
   const filtered = useMemo(
     () => (category === "ALL" ? news : news.filter((n) => n.category === category)),
@@ -34,24 +36,24 @@ export default function NewsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="border-b border-fw-border pb-5">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">Football Daily</p>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">The Latest News</h1>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">{t("news.eyebrow")}</p>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">{t("news.title")}</h1>
       </div>
 
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
-        {CATEGORIES.map((c) => (
+        {CATEGORY_VALUES.map((c) => (
           <button
-            key={c.value}
-            onClick={() => setCategory(c.value)}
-            className={cn("shrink-0", category === c.value ? "opacity-100" : "opacity-60 hover:opacity-90")}
+            key={c}
+            onClick={() => setCategory(c)}
+            className={cn("shrink-0", category === c ? "opacity-100" : "opacity-60 hover:opacity-90")}
           >
-            <Pill tone={category === c.value ? "accent" : "neutral"}>{c.label}</Pill>
+            <Pill tone={category === c ? "accent" : "neutral"}>{c === "ALL" ? t("news.all") : t(`news.category.${c}`)}</Pill>
           </button>
         ))}
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState icon={Newspaper} title="THE FOOTBALL WORLD IS QUIET..." message="For now." />
+        <EmptyState icon={Newspaper} title={t("news.emptyTitle")} message={t("news.emptyMsg")} />
       ) : (
         <div className="flex flex-col gap-6">
           {featured && (
@@ -63,14 +65,18 @@ export default function NewsPage() {
                 <Newspaper className="h-10 w-10 opacity-40" />
               </div>
               <div className="flex items-center gap-2">
-                <Pill tone="accent">{CATEGORIES.find((c) => c.value === featured.category)?.label}</Pill>
-                {featured.isBreaking && <Pill tone="negative">Breaking</Pill>}
-                <span className="ml-auto text-[11px] font-semibold uppercase tracking-wide text-fw-text-faint">
-                  Week {featured.week}
+                <Pill tone="accent">{t(`news.category.${featured.category}`)}</Pill>
+                {featured.isBreaking && <Pill tone="negative">{t("news.breaking")}</Pill>}
+                <span className="ms-auto text-[11px] font-semibold uppercase tracking-wide text-fw-text-faint">
+                  {t("news.week", { n: featured.week })}
                 </span>
               </div>
-              <h2 className="mt-3 font-display text-2xl font-bold uppercase leading-tight text-fw-text">{featured.headline}</h2>
-              <p className="mt-2 text-sm text-fw-text-dim">{featured.summary}</p>
+              <h2 dir="ltr" className="mt-3 text-start font-display text-2xl font-bold uppercase leading-tight text-fw-text">
+                {featured.headline}
+              </h2>
+              <p dir="ltr" className="mt-2 text-start text-sm text-fw-text-dim">
+                {featured.summary}
+              </p>
             </div>
           )}
 

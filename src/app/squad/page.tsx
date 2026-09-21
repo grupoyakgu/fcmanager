@@ -12,6 +12,7 @@ import PlayerMiniCard from "@/components/player/PlayerMiniCard";
 import EmptyState from "@/components/ui/EmptyState";
 import { calculateTeamRating, calculateSquadValue, calculateAverageAge } from "@/lib/calculateTeamRating";
 import { formatCurrency } from "@/lib/formatCurrency";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function SquadPage() {
   const players = useGameStore((s) => s.players);
@@ -23,6 +24,7 @@ export default function SquadPage() {
   const setLineupSlot = useGameStore((s) => s.setLineupSlot);
   const setCaptain = useGameStore((s) => s.setCaptain);
   const openPlayer = useUiStore((s) => s.openPlayer);
+  const { t } = useTranslation();
 
   const [activeSlotIndex, setActiveSlotIndex] = useState<number | null>(null);
 
@@ -38,17 +40,17 @@ export default function SquadPage() {
     : [];
 
   if (squad.length === 0) {
-    return <EmptyState icon={Users} title="NO SQUAD YET" message="Your squad will appear here once your club is ready." />;
+    return <EmptyState icon={Users} title={t("squad.noSquadTitle")} message={t("squad.noSquadMsg")} />;
   }
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <SectionHeader eyebrow="Team Management" title="Squad" />
+        <SectionHeader eyebrow={t("squad.eyebrow")} title={t("squad.title")} />
         <div className="grid grid-cols-3 gap-3 sm:max-w-md">
-          <StatTile label="OVR" value={String(calculateTeamRating(startingPlayers.length ? startingPlayers : squad))} />
-          <StatTile label="Value" value={formatCurrency(calculateSquadValue(squad))} />
-          <StatTile label="Avg Age" value={calculateAverageAge(squad).toFixed(1)} />
+          <StatTile label={t("squad.ovr")} value={String(calculateTeamRating(startingPlayers.length ? startingPlayers : squad))} />
+          <StatTile label={t("squad.value")} value={formatCurrency(calculateSquadValue(squad))} />
+          <StatTile label={t("squad.avgAge")} value={calculateAverageAge(squad).toFixed(1)} />
         </div>
       </div>
 
@@ -69,7 +71,7 @@ export default function SquadPage() {
           <div className="rounded-xl border border-fw-border bg-fw-surface p-4">
             <div className="mb-3 flex items-center justify-between">
               <p className="font-display text-sm font-bold uppercase tracking-wide text-fw-text">
-                {activeSlot ? `Select ${activeSlot.position}` : "Selected Player"}
+                {activeSlot ? t("squad.select", { pos: activeSlot.position }) : t("squad.selectedPlayer")}
               </p>
               {activeSlot && (
                 <button onClick={() => setActiveSlotIndex(null)} className="text-fw-text-faint hover:text-fw-text">
@@ -79,7 +81,7 @@ export default function SquadPage() {
             </div>
 
             {!activeSlot && (
-              <p className="text-sm text-fw-text-faint">Tap any position on the pitch to view or change your selection.</p>
+              <p className="text-sm text-fw-text-faint">{t("squad.selectHint")}</p>
             )}
 
             {activeSlot && (
@@ -89,11 +91,11 @@ export default function SquadPage() {
                     onClick={() => setLineupSlot(activeSlot.slotIndex, null)}
                     className="mb-1 rounded-lg border border-fw-negative/30 bg-fw-negative/10 px-3 py-2 text-xs font-bold uppercase tracking-wide text-fw-negative"
                   >
-                    Remove From XI
+                    {t("squad.removeFromXi")}
                   </button>
                 )}
                 {eligiblePlayers.length === 0 && (
-                  <p className="text-sm text-fw-text-faint">No {activeSlot.position} players in your squad.</p>
+                  <p className="text-sm text-fw-text-faint">{t("squad.noPlayersForPosition", { pos: activeSlot.position })}</p>
                 )}
                 {eligiblePlayers.map((p) => (
                   <PlayerMiniCard
@@ -122,9 +124,9 @@ export default function SquadPage() {
       </div>
 
       <div>
-        <SectionHeader eyebrow="Reserves" title="Bench" />
+        <SectionHeader eyebrow={t("squad.reserves")} title={t("squad.bench")} />
         {benchPlayers.length === 0 ? (
-          <EmptyState title="BENCH IS EMPTY" message="Every fit squad player is currently in your starting XI." />
+          <EmptyState title={t("squad.benchEmptyTitle")} message={t("squad.benchEmptyMsg")} />
         ) : (
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {benchPlayers.map((p) => (
@@ -135,7 +137,7 @@ export default function SquadPage() {
       </div>
 
       <div>
-        <SectionHeader eyebrow="Full Roster" title="Squad List" />
+        <SectionHeader eyebrow={t("squad.fullRoster")} title={t("squad.squadList")} />
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {squad
             .sort((a, b) => b.overallRating - a.overallRating)

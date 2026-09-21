@@ -7,17 +7,20 @@ import PlayerPortrait from "@/components/player/PlayerPortrait";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { flagFor } from "@/data/nameData";
 import { developmentLabel, potentialRange, scoutConfidence, generateScoutNote } from "@/lib/scoutReport";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function ScoutReport() {
   const reportPlayerId = useUiStore((s) => s.reportPlayerId);
   const closeReport = useUiStore((s) => s.closeReport);
   const openOffer = useUiStore((s) => s.openOffer);
   const player = useGameStore((s) => (reportPlayerId ? s.players.find((p) => p.id === reportPlayerId) : undefined));
+  const { t } = useTranslation();
 
   if (!reportPlayerId || !player) return null;
   const initials = `${player.firstName[0]}${player.lastName[0]}`;
   const range = potentialRange(player);
   const confidence = scoutConfidence(player);
+  const devLabel = t(`report.dev.${developmentLabel(player.developmentRate).toLowerCase()}`);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-6" onClick={closeReport}>
@@ -28,7 +31,7 @@ export default function ScoutReport() {
         <div className="flex items-center justify-between border-b border-fw-border px-5 py-4">
           <div className="flex items-center gap-2">
             <FileText className="h-4 w-4 text-fw-accent" />
-            <h2 className="font-display text-sm font-bold uppercase tracking-widest text-fw-accent">Scout Report</h2>
+            <h2 className="font-display text-sm font-bold uppercase tracking-widest text-fw-accent">{t("report.title")}</h2>
           </div>
           <button onClick={closeReport} className="rounded-lg p-1.5 text-fw-text-faint hover:bg-fw-surface-hover hover:text-fw-text">
             <X className="h-4 w-4" />
@@ -39,7 +42,7 @@ export default function ScoutReport() {
           <PlayerPortrait position={player.position} initials={initials} className="h-20 w-20" />
           <div>
             <p className="font-display text-xl font-bold uppercase text-fw-text">
-              {player.firstName} {player.lastName} <span className="ml-1">{flagFor(player.nationality)}</span>
+              {player.firstName} {player.lastName} <span className="ms-1">{flagFor(player.nationality)}</span>
             </p>
             <p className="text-xs font-semibold uppercase tracking-wide text-fw-text-faint">
               {player.age} &middot; {player.position} &middot; {player.overallRating} OVR
@@ -48,15 +51,17 @@ export default function ScoutReport() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 px-5 py-5">
-          <ReportTile label="Potential" value={`${range.low}-${range.high}`} accent />
-          <ReportTile label="Development" value={developmentLabel(player.developmentRate)} />
-          <ReportTile label="Market Value" value={formatCurrency(player.marketValue)} />
-          <ReportTile label="Confidence" value={`${confidence}%`} />
+          <ReportTile label={t("report.potential")} value={`${range.low}-${range.high}`} accent />
+          <ReportTile label={t("report.development")} value={devLabel} />
+          <ReportTile label={t("report.marketValue")} value={formatCurrency(player.marketValue)} />
+          <ReportTile label={t("report.confidence")} value={`${confidence}%`} />
         </div>
 
         <div className="mx-5 mb-5 rounded-lg border border-fw-border bg-fw-surface p-4">
-          <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">Scout&apos;s Note</p>
-          <p className="text-sm leading-relaxed text-fw-text-dim">{generateScoutNote(player)}</p>
+          <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{t("report.note")}</p>
+          <p dir="ltr" className="text-start text-sm leading-relaxed text-fw-text-dim">
+            {generateScoutNote(player)}
+          </p>
         </div>
 
         <div className="border-t border-fw-border px-5 py-4">
@@ -67,7 +72,7 @@ export default function ScoutReport() {
             }}
             className="w-full rounded-lg bg-fw-accent px-4 py-3 font-display text-sm font-bold uppercase tracking-wider text-fw-accent-fg"
           >
-            Make Offer
+            {t("report.makeOffer")}
           </button>
         </div>
       </div>

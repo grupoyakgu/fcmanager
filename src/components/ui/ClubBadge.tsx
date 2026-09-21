@@ -1,5 +1,6 @@
 import { BADGE_TEMPLATES } from "@/data/badges";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 interface ClubBadgeProps {
   badgeId: string;
@@ -76,6 +77,7 @@ function ShapeOutline({ shape, primary, secondary }: { shape: string; primary: s
 
 export default function ClubBadge({ badgeId, primaryColor, secondaryColor, size = 40, className }: ClubBadgeProps) {
   const template = BADGE_TEMPLATES.find((b) => b.id === badgeId) ?? BADGE_TEMPLATES[0];
+  const { t } = useTranslation();
   return (
     <svg
       viewBox="0 0 24 24"
@@ -83,7 +85,7 @@ export default function ClubBadge({ badgeId, primaryColor, secondaryColor, size 
       height={size}
       className={cn("shrink-0 drop-shadow-sm", className)}
       role="img"
-      aria-label="Club badge"
+      aria-label={t("common.clubBadge")}
     >
       <ShapeOutline shape={template.shape} primary={primaryColor} secondary={secondaryColor} />
       <SymbolShape symbol={template.symbol} color={secondaryColor} />

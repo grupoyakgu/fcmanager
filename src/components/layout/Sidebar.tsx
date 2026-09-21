@@ -6,17 +6,19 @@ import { NAV_ITEMS } from "@/components/layout/navConfig";
 import ClubBadge from "@/components/ui/ClubBadge";
 import { useGameStore } from "@/game/store";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const club = useGameStore((s) => s.club);
+  const { t } = useTranslation();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[232px] shrink-0 flex-col border-r border-fw-border bg-fw-bg-elevated lg:flex">
+    <aside className="fixed inset-y-0 start-0 z-30 hidden w-[232px] shrink-0 flex-col border-e border-fw-border bg-fw-bg-elevated lg:flex">
       <div className="flex items-center gap-2 px-5 py-6">
         <span className="h-2.5 w-2.5 rounded-full bg-fw-accent" />
         <span className="font-display text-sm font-bold uppercase tracking-[0.18em] text-fw-text">
-          Football World
+          {t("brand.name")}
         </span>
       </div>
 
@@ -36,8 +38,8 @@ export default function Sidebar() {
               )}
             >
               <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.4 : 2} />
-              <span className="uppercase tracking-wide">{item.label}</span>
-              {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-fw-accent" />}
+              <span className="uppercase tracking-wide">{t(item.labelKey)}</span>
+              {active && <span className="ms-auto h-1.5 w-1.5 rounded-full bg-fw-accent" />}
             </Link>
           );
         })}

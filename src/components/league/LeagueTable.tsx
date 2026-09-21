@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { Club, LeagueTableRow } from "@/types";
 import ClubBadge from "@/components/ui/ClubBadge";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function LeagueTable({
   table,
@@ -12,21 +13,22 @@ export default function LeagueTable({
   clubs: Club[];
   userClubId: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="overflow-hidden rounded-xl border border-fw-border">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-fw-border bg-fw-bg-elevated text-[10px] font-bold uppercase tracking-wider text-fw-text-faint">
-            <th className="px-3 py-2.5 text-left">Pos</th>
-            <th className="px-3 py-2.5 text-left">Club</th>
-            <th className="px-2 py-2.5 text-center">P</th>
-            <th className="hidden px-2 py-2.5 text-center sm:table-cell">W</th>
-            <th className="hidden px-2 py-2.5 text-center sm:table-cell">D</th>
-            <th className="hidden px-2 py-2.5 text-center sm:table-cell">L</th>
-            <th className="hidden px-2 py-2.5 text-center md:table-cell">GF</th>
-            <th className="hidden px-2 py-2.5 text-center md:table-cell">GA</th>
-            <th className="px-2 py-2.5 text-center">GD</th>
-            <th className="px-3 py-2.5 text-center">Pts</th>
+            <th className="px-3 py-2.5 text-start">{t("league.pos")}</th>
+            <th className="px-3 py-2.5 text-start">{t("league.club")}</th>
+            <th className="px-2 py-2.5 text-center">{t("league.p")}</th>
+            <th className="hidden px-2 py-2.5 text-center sm:table-cell">{t("league.w")}</th>
+            <th className="hidden px-2 py-2.5 text-center sm:table-cell">{t("league.d")}</th>
+            <th className="hidden px-2 py-2.5 text-center sm:table-cell">{t("league.l")}</th>
+            <th className="hidden px-2 py-2.5 text-center md:table-cell">{t("league.gf")}</th>
+            <th className="hidden px-2 py-2.5 text-center md:table-cell">{t("league.ga")}</th>
+            <th className="px-2 py-2.5 text-center">{t("league.gd")}</th>
+            <th className="px-3 py-2.5 text-center">{t("league.pts")}</th>
           </tr>
         </thead>
         <tbody>

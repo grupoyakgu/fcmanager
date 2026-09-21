@@ -4,9 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MOBILE_NAV_ITEMS } from "@/components/layout/navConfig";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-fw-border bg-fw-bg-elevated/95 backdrop-blur lg:hidden">
       {MOBILE_NAV_ITEMS.map((item) => {
@@ -22,7 +24,7 @@ export default function BottomNav() {
             )}
           >
             <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 2} />
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         );
       })}

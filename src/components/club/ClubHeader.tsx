@@ -5,10 +5,12 @@ import { useGameStore } from "@/game/store";
 import { getClubPosition } from "@/game/engines/leagueEngine";
 import { USER_CLUB_ID } from "@/game/repositories/worldRepository";
 import { formatCurrency } from "@/lib/formatCurrency";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function ClubHeader() {
   const club = useGameStore((s) => s.club);
   const table = useGameStore((s) => s.table);
+  const { t } = useTranslation();
 
   if (!club) return null;
   const position = table.length ? getClubPosition(table, USER_CLUB_ID) : null;
@@ -20,15 +22,15 @@ export default function ClubHeader() {
         <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">{club.name}</h1>
         <p className="text-xs font-semibold uppercase tracking-wide text-fw-text-faint">{club.nickname}</p>
       </div>
-      <div className="ml-auto flex items-center gap-6">
-        <div className="text-right">
+      <div className="ms-auto flex items-center gap-6">
+        <div className="text-end">
           <p className="font-display text-xl font-bold tabular-nums text-fw-positive">{formatCurrency(club.budget)}</p>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-fw-text-faint">Cash</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-fw-text-faint">{t("club.cash")}</p>
         </div>
         {position !== null && (
-          <div className="text-right">
+          <div className="text-end">
             <p className="font-display text-xl font-bold tabular-nums text-fw-text">#{position}</p>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-fw-text-faint">Global Premier League</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-fw-text-faint">{t("club.gpl")}</p>
           </div>
         )}
       </div>

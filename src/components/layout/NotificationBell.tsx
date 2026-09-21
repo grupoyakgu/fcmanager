@@ -6,6 +6,7 @@ import { useGameStore } from "@/game/store";
 import { cn } from "@/lib/utils";
 import { NotificationType } from "@/types";
 import EmptyState from "@/components/ui/EmptyState";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const ICONS: Record<NotificationType, typeof Bell> = {
   SCOUT_REPORT_READY: UserCheck,
@@ -25,6 +26,7 @@ export default function NotificationBell() {
   const markAllRead = useGameStore((s) => s.markAllNotificationsRead);
   const markRead = useGameStore((s) => s.markNotificationRead);
   const unread = notifications.filter((n) => !n.read).length;
+  const { t } = useTranslation();
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -44,19 +46,19 @@ export default function NotificationBell() {
       >
         <Bell className="h-[18px] w-[18px]" />
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-fw-negative px-1 text-[10px] font-bold text-white">
+          <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-fw-negative px-1 text-[10px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="fw-animate-in absolute right-0 top-11 z-40 w-80 overflow-hidden rounded-xl border border-fw-border bg-fw-bg-elevated shadow-2xl">
+        <div className="fw-animate-in absolute end-0 top-11 z-40 w-80 overflow-hidden rounded-xl border border-fw-border bg-fw-bg-elevated shadow-2xl">
           <div className="flex items-center justify-between border-b border-fw-border px-4 py-3">
-            <p className="font-display text-sm font-semibold uppercase tracking-wide">Notifications</p>
+            <p className="font-display text-sm font-semibold uppercase tracking-wide">{t("notif.title")}</p>
             {unread > 0 && (
               <button onClick={markAllRead} className="text-xs font-semibold text-fw-accent hover:underline">
-                Mark all read
+                {t("notif.markAllRead")}
               </button>
             )}
           </div>
@@ -64,8 +66,8 @@ export default function NotificationBell() {
             {notifications.length === 0 ? (
               <EmptyState
                 icon={Bell}
-                title="THE FOOTBALL WORLD IS QUIET..."
-                message="For now. Notifications will appear here as things happen."
+                title={t("notif.emptyTitle")}
+                message={t("notif.emptyMessage")}
                 className="border-0"
               />
             ) : (
@@ -76,7 +78,7 @@ export default function NotificationBell() {
                     key={n.id}
                     onClick={() => markRead(n.id)}
                     className={cn(
-                      "flex w-full items-start gap-3 border-b border-fw-border/60 px-4 py-3 text-left transition-colors hover:bg-fw-surface-hover",
+                      "flex w-full items-start gap-3 border-b border-fw-border/60 px-4 py-3 text-start transition-colors hover:bg-fw-surface-hover",
                       !n.read && "bg-fw-accent/5"
                     )}
                   >
@@ -85,7 +87,7 @@ export default function NotificationBell() {
                       <p className="truncate text-sm font-semibold text-fw-text">{n.title}</p>
                       <p className="line-clamp-2 text-xs text-fw-text-dim">{n.message}</p>
                     </div>
-                    {!n.read && <span className="ml-auto mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-fw-accent" />}
+                    {!n.read && <span className="ms-auto mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-fw-accent" />}
                   </button>
                 );
               })

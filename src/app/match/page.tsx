@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PlayCircle, Trophy } from "lucide-react";
+import { PlayCircle, Trophy, ArrowRight, ArrowLeft } from "lucide-react";
 import { useGameStore } from "@/game/store";
 import { USER_CLUB_ID } from "@/game/repositories/worldRepository";
 import MatchPreview from "@/components/match/MatchPreview";
@@ -11,6 +11,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import { calculateTeamRating } from "@/lib/calculateTeamRating";
 import { MatchResult } from "@/types";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function MatchPage() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function MatchPage() {
   const lineup = useGameStore((s) => s.lineup);
   const getNextUserFixture = useGameStore((s) => s.getNextUserFixture);
   const simulateNextUserMatch = useGameStore((s) => s.simulateNextUserMatch);
+  const { t, isRtl } = useTranslation();
+  const NextIcon = isRtl ? ArrowLeft : ArrowRight;
 
   const [freshResult, setFreshResult] = useState<MatchResult | null>(null);
   const [simulating, setSimulating] = useState(false);
@@ -39,14 +42,14 @@ export default function MatchPage() {
           onClick={() => setFreshResult(null)}
           className="rounded-lg bg-fw-accent px-5 py-3 font-display text-sm font-bold uppercase tracking-wide text-fw-accent-fg"
         >
-          Continue
+          {t("match.continue")}
         </button>
       </div>
     );
   }
 
   if (!nextFixture) {
-    return <EmptyState icon={Trophy} title="SEASON COMPLETE" message="There are no fixtures remaining right now." />;
+    return <EmptyState icon={Trophy} title={t("match.seasonComplete")} message={t("match.seasonCompleteMsg")} />;
   }
 
   const homeClub = clubs.find((c) => c.id === nextFixture.homeClubId)!;
@@ -72,25 +75,25 @@ export default function MatchPage() {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl border border-fw-border bg-fw-surface p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">Your Form</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{t("match.yourForm")}</p>
           <FormRow form={userRow?.form ?? []} />
         </div>
         <div className="rounded-xl border border-fw-border bg-fw-surface p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{opponent.shortName} Form</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{t("match.opponentForm", { club: opponent.shortName })}</p>
           <FormRow form={opponentRow?.form ?? []} />
         </div>
       </div>
 
       <div className="rounded-xl border border-fw-border bg-fw-surface p-4">
         <div className="flex items-center justify-between">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">Opponent Strength</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{t("match.opponentStrength")}</p>
           <p className="font-display text-2xl font-bold tabular-nums text-fw-text">{opponentRating}</p>
         </div>
-        <p className="mt-1 text-xs text-fw-text-faint">{opponent.identity.replaceAll("_", " ")}</p>
+        <p className="mt-1 text-xs text-fw-text-faint">{t(`identity.${opponent.identity}`)}</p>
       </div>
 
       <div>
-        <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">Key Players ({startingXi.length}/11 Selected)</p>
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-fw-text-faint">{t("match.keyPlayers", { n: startingXi.length })}</p>
         <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
           {startingXi
             .sort((a, b) => b.overallRating - a.overallRating)
@@ -103,8 +106,8 @@ export default function MatchPage() {
             ))}
         </div>
         {startingXi.length < 11 && (
-          <button onClick={() => router.push("/squad")} className="mt-2 text-xs font-semibold text-fw-accent hover:underline">
-            Complete your starting XI in Squad →
+          <button onClick={() => router.push("/squad")} className="mt-2 flex items-center gap-1 text-xs font-semibold text-fw-accent hover:underline">
+            {t("match.completeXi")} <NextIcon className="h-3 w-3" />
           </button>
         )}
       </div>
@@ -115,14 +118,15 @@ export default function MatchPage() {
         className="flex items-center justify-center gap-2 rounded-lg bg-fw-accent px-6 py-4 font-display text-sm font-bold uppercase tracking-widest text-fw-accent-fg transition-transform enabled:hover:scale-[1.01] disabled:opacity-40"
       >
         <PlayCircle className={cn("h-5 w-5", simulating && "fw-pulse")} />
-        {simulating ? "Simulating..." : "Simulate Match"}
+        {simulating ? t("match.simulating") : t("match.simulate")}
       </button>
     </div>
   );
 }
 
 function FormRow({ form }: { form: ("W" | "D" | "L")[] }) {
-  if (form.length === 0) return <p className="mt-1 text-sm text-fw-text-faint">No matches played yet.</p>;
+  const { t } = useTranslation();
+  if (form.length === 0) return <p className="mt-1 text-sm text-fw-text-faint">{t("match.noMatches")}</p>;
   return (
     <div className="mt-2 flex gap-1.5">
       {form.map((r, idx) => (

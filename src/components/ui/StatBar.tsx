@@ -22,7 +22,7 @@ export default function StatBar({ label, value, max = 99, className }: StatBarPr
       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-fw-border">
         <div className={cn("h-full rounded-full", colorFor(value))} style={{ width: `${pct}%` }} />
       </div>
-      <span className="w-7 shrink-0 text-right font-display text-sm font-semibold tabular-nums text-fw-text">
+      <span className="w-7 shrink-0 text-end font-display text-sm font-semibold tabular-nums text-fw-text">
         {value}
       </span>
     </div>

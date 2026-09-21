@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Newspaper, Trophy } from "lucide-react";
+import { ArrowRight, ArrowLeft, Newspaper, Trophy } from "lucide-react";
 import { useGameStore } from "@/game/store";
 import { useUiStore } from "@/game/uiStore";
 import { USER_CLUB_ID } from "@/game/repositories/worldRepository";
@@ -13,6 +13,7 @@ import PlayerCard from "@/components/player/PlayerCard";
 import EmptyState from "@/components/ui/EmptyState";
 import { getRecommendedPlayers } from "@/lib/getRecommendedPlayers";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function HomePage() {
   const club = useGameStore((s) => s.club);
@@ -22,6 +23,8 @@ export default function HomePage() {
   const news = useGameStore((s) => s.news);
   const getNextUserFixture = useGameStore((s) => s.getNextUserFixture);
   const openPlayer = useUiStore((s) => s.openPlayer);
+  const { t, isRtl } = useTranslation();
+  const NextIcon = isRtl ? ArrowLeft : ArrowRight;
 
   if (!club) return null;
 
@@ -43,22 +46,22 @@ export default function HomePage() {
               href="/squad"
               className="rounded-lg border border-fw-border bg-fw-bg px-5 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-fw-text transition-colors hover:border-fw-border-strong"
             >
-              Manage Squad
+              {t("home.manageSquad")}
             </Link>
             <Link
               href="/match"
               className="rounded-lg bg-fw-accent px-5 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-fw-accent-fg transition-transform hover:scale-[1.02]"
             >
-              Play Match
+              {t("home.playMatch")}
             </Link>
           </div>
         </MatchPreview>
       ) : (
-        <EmptyState icon={Trophy} title="SEASON COMPLETE" message="There are no fixtures remaining right now." />
+        <EmptyState icon={Trophy} title={t("home.seasonComplete")} message={t("home.seasonCompleteMsg")} />
       )}
 
       <section>
-        <SectionHeader eyebrow="Momentum" title="Recent Form" />
+        <SectionHeader eyebrow={t("home.momentum")} title={t("home.recentForm")} />
         <div className="flex items-center gap-2">
           {(userRow?.form.length ? userRow.form : []).map((r, idx) => (
             <span
@@ -74,23 +77,23 @@ export default function HomePage() {
             </span>
           ))}
           {!userRow?.form.length && (
-            <p className="text-sm text-fw-text-faint">No matches played yet this season.</p>
+            <p className="text-sm text-fw-text-faint">{t("home.noMatches")}</p>
           )}
         </div>
       </section>
 
       <section>
         <SectionHeader
-          eyebrow="Football Daily"
-          title="Latest Headlines"
+          eyebrow={t("home.footballDaily")}
+          title={t("home.latestHeadlines")}
           action={
             <Link href="/news" className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-fw-accent hover:underline">
-              View All <ArrowRight className="h-3 w-3" />
+              {t("common.viewAll")} <NextIcon className="h-3 w-3" />
             </Link>
           }
         />
         {news.length === 0 ? (
-          <EmptyState icon={Newspaper} title="THE FOOTBALL WORLD IS QUIET..." message="For now." />
+          <EmptyState icon={Newspaper} title={t("news.emptyTitle")} message={t("news.emptyMsg")} />
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {news.slice(0, 4).map((item) => (
@@ -102,16 +105,16 @@ export default function HomePage() {
 
       <section>
         <SectionHeader
-          eyebrow="Scouting Desk"
-          title="Transfer Opportunities"
+          eyebrow={t("home.scoutingDesk")}
+          title={t("home.transferOpportunities")}
           action={
             <Link href="/transfers" className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-fw-accent hover:underline">
-              View Market <ArrowRight className="h-3 w-3" />
+              {t("common.viewMarket")} <NextIcon className="h-3 w-3" />
             </Link>
           }
         />
         {recommended.length === 0 ? (
-          <EmptyState title="NO OFFERS YET" message="Your squad already covers every position well." />
+          <EmptyState title={t("home.noOffersTitle")} message={t("home.noOffersSquadGood")} />
         ) : (
           <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1">
             {recommended.map((p) => (

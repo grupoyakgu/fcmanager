@@ -1,6 +1,7 @@
 import { Club, Fixture } from "@/types";
 import ClubBadge from "@/components/ui/ClubBadge";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const KICKOFF_DAYS = ["Friday", "Saturday", "Saturday", "Sunday", "Sunday"];
 const KICKOFF_TIMES = ["18:00", "15:00", "20:00", "14:00", "16:30"];
@@ -25,6 +26,7 @@ export default function MatchPreview({
   variant?: "hero" | "full";
   children?: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const kickoff = kickoffFor(fixture.matchday);
   return (
     <div
@@ -41,7 +43,7 @@ export default function MatchPreview({
       />
       <div className="relative z-10 p-5 sm:p-7">
         <p className="text-center text-[11px] font-bold uppercase tracking-[0.3em] text-fw-accent">
-          Matchday {fixture.matchday}
+          {t("match.matchday", { n: fixture.matchday })}
         </p>
 
         <div className="mt-4 grid grid-cols-3 items-center gap-2">
@@ -53,7 +55,7 @@ export default function MatchPreview({
         </div>
 
         <p className="mt-5 text-center text-xs font-semibold uppercase tracking-wide text-fw-text-faint">
-          {kickoff.day} {kickoff.time} &middot; {homeClub.stadium}
+          {t(`match.day.${kickoff.day}`)} {kickoff.time} &middot; {homeClub.stadium}
         </p>
 
         {children}
@@ -66,7 +68,7 @@ function TeamBlock({ club, align }: { club: Club; align: "left" | "right" }) {
   return (
     <div className={cn("flex flex-col items-center gap-2", align === "left" ? "sm:items-end" : "sm:items-start")}>
       <ClubBadge badgeId={club.badgeId} primaryColor={club.primaryColor} secondaryColor={club.secondaryColor} size={44} />
-      <p className="text-center text-sm font-bold uppercase leading-tight text-fw-text sm:text-right">{club.name}</p>
+      <p className="text-center text-sm font-bold uppercase leading-tight text-fw-text sm:text-end">{club.name}</p>
     </div>
   );
 }
