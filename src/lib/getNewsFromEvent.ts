@@ -76,12 +76,12 @@ export function newsFromWonderkid(player: Player, week: number): NewsItem {
   };
 }
 
-export function newsFromLeagueMovement(club: Club, position: number, direction: "up" | "down", week: number): NewsItem {
+export function newsFromLeagueMovement(club: Club, position: number, direction: "up" | "down", week: number, leagueName: string): NewsItem {
   return {
     id: makeId("news"),
     category: "LEAGUE_NEWS",
     headline: direction === "up" ? `${club.name} climb to ${position}${ordinal(position)}` : `${club.name} slip to ${position}${ordinal(position)}`,
-    summary: `${club.name} now sit ${position}${ordinal(position)} in the Global Premier League table.`,
+    summary: `${club.name} now sit ${position}${ordinal(position)} in the ${leagueName} table.`,
     timestamp: week,
     week,
     relatedClubId: club.id,

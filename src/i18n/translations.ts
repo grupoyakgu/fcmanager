@@ -19,6 +19,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "common.age": "AGE {n}",
     "common.value": "Value",
     "common.clubBadge": "Club badge",
+    "common.clubKit": "Club kit",
 
     // Nav
     "nav.home": "Home",
@@ -33,7 +34,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     // Topbar
     "topbar.matchday": "Matchday {n}",
     "topbar.cash": "Cash",
-    "topbar.leagueShort": "GPL",
+    "topbar.leagueShort": "Table Pos.",
 
     // Notifications
     "notif.title": "Notifications",
@@ -56,6 +57,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "onboarding.identity.country": "Country",
     "onboarding.badge.title": "Choose Your Badge",
     "onboarding.colors.title": "Club Colors",
+    "onboarding.colors.kit": "Kit Pattern",
     "onboarding.colors.primary": "Primary Color",
     "onboarding.colors.secondary": "Secondary Color",
     "onboarding.reveal.welcome": "Welcome",
@@ -79,7 +81,6 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
 
     // Club header
     "club.cash": "Cash",
-    "club.gpl": "Global Premier League",
 
     // My Club
     "myClub.eyebrow": "Season",
@@ -134,7 +135,6 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "squad.noSquadMsg": "Your squad will appear here once your club is ready.",
 
     // Transfers
-    "transfers.eyebrow": "Global Premier League",
     "transfers.title": "Transfer Market",
     "transfers.availableCash": "Available Cash",
     "transfers.filters": "Filters",
@@ -273,7 +273,6 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
 
     // League
     "league.eyebrow": "Season Standings",
-    "league.title": "Global Premier League",
     "league.matchday": "Matchday {current} of {total}",
     "league.pos": "Pos",
     "league.club": "Club",
@@ -331,6 +330,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "common.age": "גיל {n}",
     "common.value": "שווי",
     "common.clubBadge": "סמל המועדון",
+    "common.clubKit": "מדי המועדון",
 
     // Nav
     "nav.home": "בית",
@@ -345,7 +345,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     // Topbar
     "topbar.matchday": "מחזור {n}",
     "topbar.cash": "קופה",
-    "topbar.leagueShort": "GPL",
+    "topbar.leagueShort": "מיקום בליגה",
 
     // Notifications
     "notif.title": "התראות",
@@ -368,6 +368,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "onboarding.identity.country": "מדינה",
     "onboarding.badge.title": "בחר סמל למועדון",
     "onboarding.colors.title": "צבעי המועדון",
+    "onboarding.colors.kit": "דוגמת מדים",
     "onboarding.colors.primary": "צבע ראשי",
     "onboarding.colors.secondary": "צבע משני",
     "onboarding.reveal.welcome": "ברוכים הבאים",
@@ -391,7 +392,6 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
 
     // Club header
     "club.cash": "קופה",
-    "club.gpl": "הליגה העל-עולמית",
 
     // My Club
     "myClub.eyebrow": "העונה",
@@ -446,7 +446,6 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "squad.noSquadMsg": "הסגל שלך יופיע כאן ברגע שהמועדון שלך יהיה מוכן.",
 
     // Transfers
-    "transfers.eyebrow": "הליגה העל-עולמית",
     "transfers.title": "שוק ההעברות",
     "transfers.availableCash": "קופה זמינה",
     "transfers.filters": "סינון",
@@ -585,7 +584,6 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
 
     // League
     "league.eyebrow": "טבלת הדירוג",
-    "league.title": "הליגה העל-עולמית",
     "league.matchday": "מחזור {current} מתוך {total}",
     "league.pos": "מקום",
     "league.club": "מועדון",

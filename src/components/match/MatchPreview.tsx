@@ -1,5 +1,6 @@
 import { Club, Fixture } from "@/types";
 import ClubBadge from "@/components/ui/ClubBadge";
+import ClubKit from "@/components/ui/ClubKit";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/useTranslation";
 
@@ -67,7 +68,10 @@ export default function MatchPreview({
 function TeamBlock({ club, align }: { club: Club; align: "left" | "right" }) {
   return (
     <div className={cn("flex flex-col items-center gap-2", align === "left" ? "sm:items-end" : "sm:items-start")}>
-      <ClubBadge badgeId={club.badgeId} primaryColor={club.primaryColor} secondaryColor={club.secondaryColor} size={44} />
+      <div className="flex items-center gap-1.5">
+        <ClubBadge badgeId={club.badgeId} primaryColor={club.primaryColor} secondaryColor={club.secondaryColor} size={44} />
+        <ClubKit kitId={club.kitId} primaryColor={club.primaryColor} secondaryColor={club.secondaryColor} size={36} className="hidden sm:block" />
+      </div>
       <p className="text-center text-sm font-bold uppercase leading-tight text-fw-text sm:text-end">{club.name}</p>
     </div>
   );

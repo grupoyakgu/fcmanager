@@ -65,6 +65,7 @@ export interface Club {
   primaryColor: string;
   secondaryColor: string;
   badgeId: string;
+  kitId: string;
   reputation: number; // 1-100
   budget: number;
   weeklyWages: number;

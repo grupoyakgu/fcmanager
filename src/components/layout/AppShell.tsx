@@ -16,7 +16,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const hydrated = useGameStore((s) => s.hydrated);
   const onboarded = useGameStore((s) => s.onboarded);
-  const ensureWorldLoaded = useGameStore((s) => s.ensureWorldLoaded);
   const rehydrateStarted = useRef(false);
   const { t, language, isRtl } = useTranslation();
 
@@ -30,11 +29,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
     document.documentElement.dir = isRtl ? "rtl" : "ltr";
     document.documentElement.lang = language;
   }, [isRtl, language]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    ensureWorldLoaded();
-  }, [hydrated, ensureWorldLoaded]);
 
   useEffect(() => {
     if (!hydrated) return;

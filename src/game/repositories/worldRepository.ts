@@ -3,19 +3,33 @@ import { generateWorld, USER_CLUB_ID } from "@/data/players";
 import { generateFixtures } from "@/data/matches";
 import { buildSeedNews } from "@/data/news";
 import { buildPreSeasonTransferBuzz } from "@/data/transfers";
+import { leagueNameFor } from "@/data/countryLeagues";
 import { mulberry32 } from "@/lib/rng";
 import { Club, LeagueTableRow } from "@/types";
 
 const WORLD_SEED = 20260921;
 
-export function loadInitialWorld() {
-  const rng = mulberry32(WORLD_SEED + 1);
-  const aiClubs = buildAiClubs();
-  const { players, starPlayerIds } = generateWorld(WORLD_SEED);
-  const news = buildSeedNews(6);
-  const transferBuzz = buildPreSeasonTransferBuzz(players, aiClubs, rng, 6);
+function seedFor(country: string, salt: number): number {
+  let hash = 0;
+  for (let i = 0; i < country.length; i++) {
+    hash = (hash * 31 + country.charCodeAt(i)) | 0;
+  }
+  return (WORLD_SEED ^ hash) + salt;
+}
 
-  return { aiClubs, players, starPlayerIds, news, transferBuzz };
+export function loadInitialWorld(country: string) {
+  const aiClubs = buildAiClubs(country, mulberry32(seedFor(country, 1)));
+  const { players, starPlayerIds } = generateWorld(seedFor(country, 2), country, aiClubs);
+  const stars = {
+    danielCosta: players.find((p) => p.id === starPlayerIds.danielCosta)!,
+    marcoSilva: players.find((p) => p.id === starPlayerIds.marcoSilva)!,
+    lucasMoretti: players.find((p) => p.id === starPlayerIds.lucasMoretti)!,
+  };
+  const leagueName = leagueNameFor(country);
+  const news = buildSeedNews(aiClubs, stars, mulberry32(seedFor(country, 3)), leagueName, 6);
+  const transferBuzz = buildPreSeasonTransferBuzz(players, aiClubs, mulberry32(seedFor(country, 4)), 6);
+
+  return { aiClubs, players, starPlayerIds, news, transferBuzz, leagueName };
 }
 
 export function buildEmptyTable(clubs: Club[]): LeagueTableRow[] {

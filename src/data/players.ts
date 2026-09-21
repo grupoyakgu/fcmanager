@@ -1,8 +1,17 @@
-import { Player, Position } from "@/types";
+import { Club, Player, Position } from "@/types";
 import { mulberry32, randInt, randFloat, pick, clamp, RNG } from "@/lib/rng";
-import { NATIONALITIES } from "@/data/nameData";
-import { CLUB_TEMPLATES } from "@/data/clubs";
+import { NATIONALITIES, NationalityPool } from "@/data/nameData";
+import { findClubByIdentity } from "@/data/clubs";
 import { makeId } from "@/lib/utils";
+
+function pickNationality(rng: RNG, preferredCountry?: string): NationalityPool {
+  if (preferredCountry) {
+    const preferred = NATIONALITIES.find((n) => n.country === preferredCountry);
+    // Domestic-majority league: most players (but not all) come from the host country.
+    if (preferred && rng() < 0.72) return preferred;
+  }
+  return pick(rng, NATIONALITIES);
+}
 
 let usedFullNames = new Set<string>();
 
@@ -157,6 +166,7 @@ interface GenOptions {
   forceArchetype?: Archetype;
   forceWonderkid?: boolean;
   nameHint?: { first: string; last: string; nationality: string };
+  preferredCountry?: string;
 }
 
 function genPlayer(rng: RNG, opts: GenOptions): Player {
@@ -166,7 +176,7 @@ function genPlayer(rng: RNG, opts: GenOptions): Player {
 
   const nat = opts.nameHint
     ? NATIONALITIES.find((n) => n.country === opts.nameHint!.nationality)!
-    : pick(rng, NATIONALITIES);
+    : pickNationality(rng, opts.preferredCountry);
 
   let firstName = opts.nameHint?.first ?? pick(rng, nat.firstNames);
   let lastName = opts.nameHint?.last ?? pick(rng, nat.lastNames);
@@ -233,14 +243,20 @@ const USER_SQUAD_TEMPLATE: Position[] = [
 
 export const USER_CLUB_ID = "club-user";
 
-export function generateWorld(seed = 20260921) {
+export function generateWorld(seed: number, country: string, aiClubs: Club[]) {
   const rng = mulberry32(seed);
   const players: Player[] = [];
   usedFullNames = new Set<string>();
 
-  // Named star / narrative players referenced throughout the game world.
+  // Named star / narrative players referenced throughout the game world and
+  // in the seed news — kept as fixed personalities regardless of which
+  // country's league they end up playing in.
+  const starCollectorClub = findClubByIdentity(aiClubs, "STAR_COLLECTOR", rng);
+  const bigSpenderClub = findClubByIdentity(aiClubs, "BIG_SPENDER", rng);
+  const developmentClub = findClubByIdentity(aiClubs, "DEVELOPMENT_CLUB", rng);
+
   const danielCosta = genPlayer(rng, {
-    clubId: "club-red-valley",
+    clubId: starCollectorClub.id,
     position: "ST",
     tier: 1.5,
     forceAge: 31,
@@ -254,7 +270,7 @@ export function generateWorld(seed = 20260921) {
   players.push(danielCosta);
 
   const marcoSilva = genPlayer(rng, {
-    clubId: "club-capital-united",
+    clubId: bigSpenderClub.id,
     position: "CAM",
     tier: 0.4,
     forceAge: 18,
@@ -270,7 +286,7 @@ export function generateWorld(seed = 20260921) {
   players.push(marcoSilva);
 
   const lucasMoretti = genPlayer(rng, {
-    clubId: "club-eastside-athletic",
+    clubId: developmentClub.id,
     position: "RW",
     tier: 0.6,
     forceAge: 17,
@@ -283,11 +299,11 @@ export function generateWorld(seed = 20260921) {
 
   // 8 AI clubs, 12 players each. One slot per "star" club is already filled by its named player above.
   const starOccupiedSlot: Record<string, Position> = {
-    "club-red-valley": "ST",
-    "club-capital-united": "CAM",
-    "club-eastside-athletic": "RW",
+    [starCollectorClub.id]: "ST",
+    [bigSpenderClub.id]: "CAM",
+    [developmentClub.id]: "RW",
   };
-  for (const club of CLUB_TEMPLATES) {
+  for (const club of aiClubs) {
     const tier = (club.reputation - 65) / 18;
     let skippedStarSlot = false;
     for (const position of AI_SQUAD_TEMPLATE) {
@@ -295,19 +311,26 @@ export function generateWorld(seed = 20260921) {
         skippedStarSlot = true;
         continue;
       }
-      players.push(genPlayer(rng, { clubId: club.id, position, tier }));
+      players.push(genPlayer(rng, { clubId: club.id, position, tier, preferredCountry: country }));
     }
   }
 
   // User club (FC KOBY default identity) — 20 players, deliberately balanced with one weakness.
   for (const position of USER_SQUAD_TEMPLATE) {
     if (position === "RB") continue; // deliberate weakness: only one senior right-back
-    players.push(genPlayer(rng, { clubId: USER_CLUB_ID, position, tier: 0.15 }));
+    players.push(genPlayer(rng, { clubId: USER_CLUB_ID, position, tier: 0.15, preferredCountry: country }));
   }
   // The single right-back — solid but thin depth is the whole point.
-  players.push(genPlayer(rng, { clubId: USER_CLUB_ID, position: "RB", tier: 0.15 }));
+  players.push(genPlayer(rng, { clubId: USER_CLUB_ID, position: "RB", tier: 0.15, preferredCountry: country }));
   // One clear star (captain-level).
-  const clubStar = genPlayer(rng, { clubId: USER_CLUB_ID, position: "CM", tier: 1.6, forceAge: 28, forceArchetype: "prime" });
+  const clubStar = genPlayer(rng, {
+    clubId: USER_CLUB_ID,
+    position: "CM",
+    tier: 1.6,
+    forceAge: 28,
+    forceArchetype: "prime",
+    preferredCountry: country,
+  });
   players.push(clubStar);
   // Hidden high-potential player (unscouted wonderkid on the books).
   const hiddenGem = genPlayer(rng, {
@@ -317,13 +340,14 @@ export function generateWorld(seed = 20260921) {
     forceAge: 18,
     forceArchetype: "talent",
     forceWonderkid: true,
+    preferredCountry: country,
   });
   players.push(hiddenGem);
 
   // A handful of free agents circulating the market.
   const freeAgentPositions: Position[] = ["CB", "CM", "ST", "GK"];
   for (const position of freeAgentPositions) {
-    players.push(genPlayer(rng, { clubId: null, position, tier: -0.6 }));
+    players.push(genPlayer(rng, { clubId: null, position, tier: -0.6, preferredCountry: country }));
   }
 
   return { players, starPlayerIds: { danielCosta: danielCosta.id, marcoSilva: marcoSilva.id, lucasMoretti: lucasMoretti.id } };

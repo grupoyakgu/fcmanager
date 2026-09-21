@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
 import { useGameStore } from "@/game/store";
 import { NATIONALITIES } from "@/data/nameData";
 import { BADGE_TEMPLATES } from "@/data/badges";
+import { KIT_TEMPLATES } from "@/data/kits";
 import ClubBadge from "@/components/ui/ClubBadge";
+import ClubKit from "@/components/ui/ClubKit";
 import LanguageToggle from "@/components/layout/LanguageToggle";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -24,6 +26,7 @@ interface FormData {
   nickname: string;
   country: string;
   badgeId: string;
+  kitId: string;
   primaryColor: string;
   secondaryColor: string;
 }
@@ -34,6 +37,7 @@ const INITIAL: FormData = {
   nickname: "The Club",
   country: NATIONALITIES[0].country,
   badgeId: BADGE_TEMPLATES[0].id,
+  kitId: KIT_TEMPLATES[0].id,
   primaryColor: "#3ddc84",
   secondaryColor: "#0f172a",
 };
@@ -41,16 +45,10 @@ const INITIAL: FormData = {
 export default function OnboardingFlow() {
   const router = useRouter();
   const createClub = useGameStore((s) => s.createClub);
-  const worldLoaded = useGameStore((s) => s.worldLoaded);
-  const ensureWorldLoaded = useGameStore((s) => s.ensureWorldLoaded);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(INITIAL);
   const { t, isRtl } = useTranslation();
   const BackIcon = isRtl ? ChevronRight : ChevronLeft;
-
-  useEffect(() => {
-    if (!worldLoaded) ensureWorldLoaded();
-  }, [worldLoaded, ensureWorldLoaded]);
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -269,8 +267,27 @@ function ScreenColors({
         <h2 className="mt-2 font-display text-2xl font-bold uppercase text-fw-text">{t("onboarding.colors.title")}</h2>
       </div>
 
-      <div className="flex justify-center py-4">
+      <div className="flex justify-center gap-6 py-4">
         <ClubBadge badgeId={form.badgeId} primaryColor={form.primaryColor} secondaryColor={form.secondaryColor} size={88} />
+        <ClubKit kitId={form.kitId} primaryColor={form.primaryColor} secondaryColor={form.secondaryColor} size={88} />
+      </div>
+
+      <div>
+        <FieldLabel>{t("onboarding.colors.kit")}</FieldLabel>
+        <div className="grid grid-cols-6 gap-2">
+          {KIT_TEMPLATES.map((k) => (
+            <button
+              key={k.id}
+              onClick={() => update("kitId", k.id)}
+              className={cn(
+                "flex aspect-square items-center justify-center rounded-lg border bg-fw-surface transition-colors",
+                form.kitId === k.id ? "border-fw-accent bg-fw-accent/10" : "border-fw-border hover:border-fw-border-strong"
+              )}
+            >
+              <ClubKit kitId={k.id} primaryColor={form.primaryColor} secondaryColor={form.secondaryColor} size={30} />
+            </button>
+          ))}
+        </div>
       </div>
 
       <div>
@@ -322,7 +339,10 @@ function ScreenReveal({ form, onFinish }: { form: FormData; onFinish: () => void
   const { t } = useTranslation();
   return (
     <div className="fw-animate-pop flex flex-col items-center text-center">
-      <ClubBadge badgeId={form.badgeId} primaryColor={form.primaryColor} secondaryColor={form.secondaryColor} size={110} />
+      <div className="flex items-center gap-4">
+        <ClubBadge badgeId={form.badgeId} primaryColor={form.primaryColor} secondaryColor={form.secondaryColor} size={110} />
+        <ClubKit kitId={form.kitId} primaryColor={form.primaryColor} secondaryColor={form.secondaryColor} size={90} />
+      </div>
       <p className="mt-6 text-xs font-bold uppercase tracking-[0.35em] text-fw-accent">{t("onboarding.reveal.welcome")}</p>
       <h1 className="mt-2 font-display text-3xl font-bold uppercase leading-tight tracking-tight text-fw-text sm:text-4xl">
         {form.name}

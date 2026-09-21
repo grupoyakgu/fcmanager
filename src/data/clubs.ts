@@ -1,178 +1,102 @@
 import { Club, ClubIdentity } from "@/types";
+import { RNG, randInt, shuffle, pick } from "@/lib/rng";
+import { BADGE_TEMPLATES } from "@/data/badges";
+import { KIT_TEMPLATES } from "@/data/kits";
+import { countryStyle } from "@/data/countryLeagues";
+import { makeId } from "@/lib/utils";
 
-export interface ClubTemplate {
-  id: string;
-  name: string;
-  shortName: string;
-  nickname: string;
-  country: string;
-  city: string;
-  stadium: string;
-  primaryColor: string;
-  secondaryColor: string;
-  badgeId: string;
-  reputation: number;
-  budget: number;
-  identity: ClubIdentity;
-  identityLabel: string;
-  identityBlurb: string;
-}
-
-export const CLUB_TEMPLATES: ClubTemplate[] = [
-  {
-    id: "club-northbridge",
-    name: "Northbridge FC",
-    shortName: "NOR",
-    nickname: "The Bridgemen",
-    country: "England",
-    city: "Northbridge",
-    stadium: "Bridgewater Park",
-    primaryColor: "#1d4ed8",
-    secondaryColor: "#f8fafc",
-    badgeId: "badge-shield-lion",
-    reputation: 62,
-    budget: 6_200_000,
-    identity: "YOUTH_FACTORY",
-    identityLabel: "YOUTH FACTORY",
-    identityBlurb: "Targets under-21 talent and builds through the academy.",
-  },
-  {
-    id: "club-capital-united",
-    name: "Capital United",
-    shortName: "CAP",
-    nickname: "The Capitals",
-    country: "France",
-    city: "Grandport",
-    stadium: "Stade Royal",
-    primaryColor: "#7c1d2c",
-    secondaryColor: "#e8b923",
-    badgeId: "badge-crest-lion",
-    reputation: 84,
-    budget: 22_500_000,
-    identity: "BIG_SPENDER",
-    identityLabel: "BIG SPENDER",
-    identityBlurb: "Chases high-rated, proven players regardless of price.",
-  },
-  {
-    id: "club-royal-harbor",
-    name: "Royal Harbor",
-    shortName: "RHB",
-    nickname: "The Dockers",
-    country: "Netherlands",
-    city: "Harborview",
-    stadium: "Harbor Arena",
-    primaryColor: "#0f766e",
-    secondaryColor: "#f1f5f9",
-    badgeId: "badge-round-wave",
-    reputation: 58,
-    budget: 4_800_000,
-    identity: "BARGAIN_HUNTER",
-    identityLabel: "BARGAIN HUNTER",
-    identityBlurb: "Hunts undervalued players other clubs overlook.",
-  },
-  {
-    id: "club-red-valley",
-    name: "Red Valley",
-    shortName: "RVL",
-    nickname: "The Valley Reds",
-    country: "Spain",
-    city: "Valdeja",
-    stadium: "Estadio del Valle",
-    primaryColor: "#dc2626",
-    secondaryColor: "#111827",
-    badgeId: "badge-shield-star",
-    reputation: 88,
-    budget: 27_000_000,
-    identity: "STAR_COLLECTOR",
-    identityLabel: "STAR COLLECTOR",
-    identityBlurb: "Builds around marquee, elite-rated superstars.",
-  },
-  {
-    id: "club-eastside-athletic",
-    name: "Eastside Athletic",
-    shortName: "EAS",
-    nickname: "The Athletic",
-    country: "Germany",
-    city: "Eastford",
-    stadium: "Eastside Ground",
-    primaryColor: "#ea580c",
-    secondaryColor: "#1c1917",
-    badgeId: "badge-circle-bolt",
-    reputation: 66,
-    budget: 9_400_000,
-    identity: "BALANCED",
-    identityLabel: "BALANCED",
-    identityBlurb: "A well-rounded squad with no glaring weaknesses.",
-  },
-  {
-    id: "club-kingsport",
-    name: "Kingsport FC",
-    shortName: "KGS",
-    nickname: "The Kings",
-    country: "Croatia",
-    city: "Kingsport",
-    stadium: "Kingsport Stadium",
-    primaryColor: "#4338ca",
-    secondaryColor: "#facc15",
-    badgeId: "badge-hex-compass",
-    reputation: 70,
-    budget: 11_800_000,
-    identity: "TACTICAL",
-    identityLabel: "TACTICAL",
-    identityBlurb: "Disciplined, structured recruitment built around a system.",
-  },
-  {
-    id: "club-blue-borough",
-    name: "Blue Borough",
-    shortName: "BLB",
-    nickname: "The Borough",
-    country: "Serbia",
-    city: "Borough Hill",
-    stadium: "Borough Park",
-    primaryColor: "#2563eb",
-    secondaryColor: "#e2e8f0",
-    badgeId: "badge-round-eagle",
-    reputation: 54,
-    budget: 5_100_000,
-    identity: "DEVELOPMENT_CLUB",
-    identityLabel: "DEVELOPMENT CLUB",
-    identityBlurb: "Develops promising players before selling for profit.",
-  },
-  {
-    id: "club-lakeside-city",
-    name: "Lakeside City",
-    shortName: "LAK",
-    nickname: "The Lakers",
-    country: "Turkey",
-    city: "Lakeside",
-    stadium: "Lakeside Bowl",
-    primaryColor: "#0e7490",
-    secondaryColor: "#0f172a",
-    badgeId: "badge-diamond-mountain",
-    reputation: 60,
-    budget: 7_600_000,
-    identity: "DEFENSIVE_CLUB",
-    identityLabel: "DEFENSIVE CLUB",
-    identityBlurb: "Prioritizes defenders and goalkeepers above all.",
-  },
+const IDENTITIES: ClubIdentity[] = [
+  "YOUTH_FACTORY",
+  "BIG_SPENDER",
+  "BARGAIN_HUNTER",
+  "STAR_COLLECTOR",
+  "BALANCED",
+  "TACTICAL",
+  "DEVELOPMENT_CLUB",
+  "DEFENSIVE_CLUB",
 ];
 
-export function buildAiClubs(): Club[] {
-  return CLUB_TEMPLATES.map((t) => ({
-    id: t.id,
-    name: t.name,
-    shortName: t.shortName,
-    nickname: t.nickname,
-    country: t.country,
-    city: t.city,
-    stadium: t.stadium,
-    primaryColor: t.primaryColor,
-    secondaryColor: t.secondaryColor,
-    badgeId: t.badgeId,
-    reputation: t.reputation,
-    budget: t.budget,
-    weeklyWages: Math.round(t.budget * 0.018),
-    identity: t.identity,
-    isUserClub: false,
-  }));
+// [reputation, budget] tiers spread across an 8-club league, weakest to strongest.
+const STRENGTH_TIERS: [number, number][] = [
+  [52, 4_200_000],
+  [56, 5_400_000],
+  [60, 6_800_000],
+  [65, 9_200_000],
+  [70, 11_800_000],
+  [76, 15_500_000],
+  [83, 21_000_000],
+  [89, 27_500_000],
+];
+
+const COLOR_PAIRS: [string, string][] = [
+  ["#1d4ed8", "#f8fafc"],
+  ["#7c1d2c", "#e8b923"],
+  ["#0f766e", "#f1f5f9"],
+  ["#dc2626", "#111827"],
+  ["#ea580c", "#1c1917"],
+  ["#4338ca", "#facc15"],
+  ["#2563eb", "#e2e8f0"],
+  ["#0e7490", "#0f172a"],
+  ["#7e22ce", "#f5f3ff"],
+  ["#15803d", "#f0fdf4"],
+  ["#b91c1c", "#fef3c7"],
+  ["#0369a1", "#fef2f2"],
+];
+
+const STADIUM_SUFFIXES = ["Arena", "Park", "Stadium", "Ground", "Bowl"];
+
+function shortNameFrom(city: string, used: Set<string>): string {
+  const letters = city.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean);
+  let base = letters.length > 1 ? letters.map((w) => w[0]).join("") : city.slice(0, 3);
+  base = base.toUpperCase().slice(0, 4) || "CLB";
+  let candidate = base;
+  let suffix = 1;
+  while (used.has(candidate)) {
+    candidate = `${base.slice(0, 3)}${suffix}`;
+    suffix += 1;
+  }
+  used.add(candidate);
+  return candidate;
+}
+
+export function buildAiClubs(country: string, rng: RNG): Club[] {
+  const style = countryStyle(country);
+  const cities = shuffle(rng, style.cities).slice(0, 8);
+  const identities = shuffle(rng, IDENTITIES);
+  const badges = shuffle(rng, BADGE_TEMPLATES).slice(0, 8);
+  const colors = shuffle(rng, COLOR_PAIRS).slice(0, 8);
+  const tiers = shuffle(rng, STRENGTH_TIERS);
+  const usedShortNames = new Set<string>();
+
+  return cities.map((city, idx) => {
+    const namePattern = pick(rng, style.namePatterns);
+    const name = namePattern.replace("{c}", city);
+    const nicknamePattern = pick(rng, style.nicknamePatterns);
+    const nickname = nicknamePattern.replace("{c}", city);
+    const [reputation, budget] = tiers[idx];
+
+    return {
+      id: makeId("club"),
+      name,
+      shortName: shortNameFrom(city, usedShortNames),
+      nickname,
+      country,
+      city,
+      stadium: `${city} ${pick(rng, STADIUM_SUFFIXES)}`,
+      primaryColor: colors[idx][0],
+      secondaryColor: colors[idx][1],
+      badgeId: badges[idx].id,
+      kitId: pick(rng, KIT_TEMPLATES).id,
+      reputation,
+      budget,
+      weeklyWages: Math.round(budget * 0.018),
+      identity: identities[idx],
+      isUserClub: false,
+    };
+  });
+}
+
+export function findClubByIdentity(clubs: Club[], identity: ClubIdentity, rng: RNG): Club {
+  const matches = clubs.filter((c) => c.identity === identity);
+  return matches.length > 0 ? pick(rng, matches) : clubs[randInt(rng, 0, clubs.length - 1)];
 }

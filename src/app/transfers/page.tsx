@@ -20,6 +20,7 @@ export default function TransfersPage() {
   const players = useGameStore((s) => s.players);
   const marketMovements = useGameStore((s) => s.marketMovements);
   const currentWeek = useGameStore((s) => s.currentWeek);
+  const leagueName = useGameStore((s) => s.leagueName);
   const { t } = useTranslation();
 
   const [position, setPosition] = useState<Position | "ALL">("ALL");
@@ -63,7 +64,7 @@ export default function TransfersPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-fw-border pb-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">{t("transfers.eyebrow")}</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-fw-accent">{leagueName}</p>
           <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-fw-text sm:text-3xl">{t("transfers.title")}</h1>
         </div>
         <MoneyDisplay value={club.budget} label={t("transfers.availableCash")} size="lg" />

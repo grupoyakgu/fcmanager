@@ -35,6 +35,7 @@ export interface ClubCreationInput {
   nickname: string;
   country: string;
   badgeId: string;
+  kitId: string;
   primaryColor: string;
   secondaryColor: string;
 }
@@ -42,7 +43,7 @@ export interface ClubCreationInput {
 interface GameState {
   hydrated: boolean;
   onboarded: boolean;
-  worldLoaded: boolean;
+  leagueName: string;
 
   club: Club | null;
   clubs: Club[];
@@ -64,7 +65,6 @@ interface GameState {
   lastResult: MatchResult | null;
 
   setHydrated: () => void;
-  ensureWorldLoaded: () => void;
   createClub: (input: ClubCreationInput) => void;
   scoutPlayer: (playerId: string) => void;
   makeOffer: (playerId: string, offerAmount: number) => { outcome: OfferOutcome; askingPrice: number; counterOffer?: number; offerId: string };
@@ -103,7 +103,7 @@ function freshWorldState() {
   return {
     hydrated: true,
     onboarded: false,
-    worldLoaded: false,
+    leagueName: "Premier League",
     club: null,
     clubs: [],
     players: [],
@@ -133,20 +133,11 @@ export const useGameStore = create<GameState>()(
 
       setHydrated: () => set({ hydrated: true }),
 
-      ensureWorldLoaded: () => {
-        if (get().worldLoaded) return;
-        const { aiClubs, players, news, transferBuzz } = loadInitialWorld();
-        set({
-          clubs: aiClubs,
-          players,
-          news,
-          transferHistory: transferBuzz,
-          worldLoaded: true,
-        });
-      },
-
       createClub: (input) => {
-        const state = get();
+        // The whole league (AI clubs, players, news) is generated fresh here,
+        // themed to the country chosen during onboarding.
+        const { aiClubs, players, news, transferBuzz, leagueName } = loadInitialWorld(input.country);
+
         const userClub: Club = {
           id: USER_CLUB_ID,
           name: input.name,
@@ -158,6 +149,7 @@ export const useGameStore = create<GameState>()(
           primaryColor: input.primaryColor,
           secondaryColor: input.secondaryColor,
           badgeId: input.badgeId,
+          kitId: input.kitId,
           reputation: 65,
           budget: 8_400_000,
           weeklyWages: 0,
@@ -165,16 +157,16 @@ export const useGameStore = create<GameState>()(
           isUserClub: true,
         };
 
-        const allClubs = [...state.clubs, userClub];
+        const allClubs = [...aiClubs, userClub];
         const fixtures = buildLeagueFixtures(allClubs);
         const table = buildEmptyTable(allClubs);
-        const userPlayers = state.players.filter((p) => p.clubId === USER_CLUB_ID);
+        const userPlayers = players.filter((p) => p.clubId === USER_CLUB_ID);
         userClub.weeklyWages = calculateWeeklyWages(userPlayers);
 
         const notifications = addNotification(
           [],
           "CLUB_NEWS",
-          "Welcome to the Global Premier League",
+          `Welcome to the ${leagueName}`,
           `${userClub.name} are ready for Matchday 1. Your squad, transfer targets and first fixture are waiting.`,
           1
         );
@@ -182,6 +174,10 @@ export const useGameStore = create<GameState>()(
         set({
           club: userClub,
           clubs: allClubs,
+          players,
+          news,
+          transferHistory: transferBuzz,
+          leagueName,
           fixtures,
           table,
           onboarded: true,
@@ -513,7 +509,7 @@ export const useGameStore = create<GameState>()(
         if (state.table.some((r) => r.played > 0) && newPosition !== oldPosition) {
           const userClub = state.clubs.find((c) => c.id === USER_CLUB_ID)!;
           news = [
-            newsFromLeagueMovement(userClub, newPosition, newPosition < oldPosition ? "up" : "down", state.currentWeek),
+            newsFromLeagueMovement(userClub, newPosition, newPosition < oldPosition ? "up" : "down", state.currentWeek, state.leagueName),
             ...news,
           ];
         }
@@ -561,7 +557,6 @@ export const useGameStore = create<GameState>()(
           window.localStorage.removeItem(STORAGE_KEY);
         }
         set(freshWorldState());
-        get().ensureWorldLoaded();
       },
     }),
     {
