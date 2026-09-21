@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+:root {
+  --fw-bg: #0a0e14;
+  --fw-bg-elevated: #10151d;
+  --fw-surface: #141a24;
+  --fw-surface-hover: #1a222e;
+  --fw-border: #232b38;
+  --fw-border-strong: #2f394a;
+  --fw-text: #eef2f7;
+  --fw-text-dim: #97a2b4;
+  --fw-text-faint: #626d80;
+  --fw-accent: #3ddc84;
+  --fw-accent-dim: #1f8352;
+  --fw-accent-fg: #06170e;
+  --fw-pitch: #1b5e3a;
+  --fw-pitch-line: rgba(255, 255, 255, 0.18);
+  --fw-positive: #3ddc84;
+  --fw-negative: #e5484d;
+  --fw-amber: #f5a623;
+  --fw-neutral: #8a94a6;
+}
+
+@theme inline {
+  --color-background: var(--fw-bg);
+  --color-foreground: var(--fw-text);
+
+  --color-fw-bg: var(--fw-bg);
+  --color-fw-bg-elevated: var(--fw-bg-elevated);
+  --color-fw-surface: var(--fw-surface);
+  --color-fw-surface-hover: var(--fw-surface-hover);
+  --color-fw-border: var(--fw-border);
+  --color-fw-border-strong: var(--fw-border-strong);
+  --color-fw-text: var(--fw-text);
+  --color-fw-text-dim: var(--fw-text-dim);
+  --color-fw-text-faint: var(--fw-text-faint);
+  --color-fw-accent: var(--fw-accent);
+  --color-fw-accent-dim: var(--fw-accent-dim);
+  --color-fw-accent-fg: var(--fw-accent-fg);
+  --color-fw-pitch: var(--fw-pitch);
+  --color-fw-positive: var(--fw-positive);
+  --color-fw-negative: var(--fw-negative);
+  --color-fw-amber: var(--fw-amber);
+  --color-fw-neutral: var(--fw-neutral);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-oswald), var(--font-inter), ui-sans-serif, sans-serif;
+}
+
+* {
+  border-color: var(--fw-border);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--fw-bg);
+  color: var(--fw-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--fw-accent);
+  color: var(--fw-accent-fg);
+}
+
+/* Thin premium scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--fw-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--fw-border-strong);
+  border-radius: 4px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--fw-accent);
+  outline-offset: 2px;
+}
+
+@keyframes fw-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fw-animate-in {
+  animation: fw-fade-in 0.25s ease-out;
+}
+
+@keyframes fw-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.fw-animate-pop {
+  animation: fw-pop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fw-pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.fw-pulse {
+  animation: fw-pulse-soft 1.8s ease-in-out infinite;
+}
