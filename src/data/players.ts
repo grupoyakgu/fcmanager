@@ -2,6 +2,7 @@ import { Club, Player, Position } from "@/types";
 import { mulberry32, randInt, randFloat, pick, clamp, RNG } from "@/lib/rng";
 import { NATIONALITIES, NationalityPool } from "@/data/nameData";
 import { findClubByIdentity } from "@/data/clubs";
+import { findSpainClub } from "@/data/realSpain";
 import { makeId } from "@/lib/utils";
 
 function pickNationality(rng: RNG, preferredCountry?: string): NationalityPool {
@@ -305,14 +306,24 @@ export function generateWorld(seed: number, country: string, aiClubs: Club[]) {
   };
   for (const club of aiClubs) {
     const tier = (club.reputation - 65) / 18;
+    const realRoster = country === "Spain" ? findSpainClub(club.name)?.roster : undefined;
     let skippedStarSlot = false;
-    for (const position of AI_SQUAD_TEMPLATE) {
+    AI_SQUAD_TEMPLATE.forEach((position, idx) => {
       if (!skippedStarSlot && starOccupiedSlot[club.id] === position) {
         skippedStarSlot = true;
-        continue;
+        return;
       }
-      players.push(genPlayer(rng, { clubId: club.id, position, tier, preferredCountry: country }));
-    }
+      const real = realRoster?.[idx];
+      players.push(
+        genPlayer(rng, {
+          clubId: club.id,
+          position,
+          tier,
+          preferredCountry: country,
+          nameHint: real ? { first: real.first, last: real.last, nationality: real.nationality } : undefined,
+        })
+      );
+    });
   }
 
   // User club (FC KOBY default identity) — 20 players, deliberately balanced with one weakness.

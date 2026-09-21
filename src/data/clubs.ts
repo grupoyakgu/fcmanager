@@ -3,6 +3,7 @@ import { RNG, randInt, shuffle, pick } from "@/lib/rng";
 import { BADGE_TEMPLATES } from "@/data/badges";
 import { KIT_TEMPLATES } from "@/data/kits";
 import { countryStyle } from "@/data/countryLeagues";
+import { SPAIN_REAL_CLUBS } from "@/data/realSpain";
 import { makeId } from "@/lib/utils";
 
 const IDENTITIES: ClubIdentity[] = [
@@ -59,7 +60,31 @@ function shortNameFrom(city: string, used: Set<string>): string {
   return candidate;
 }
 
+function buildSpainClubs(rng: RNG): Club[] {
+  const badges = shuffle(rng, BADGE_TEMPLATES).slice(0, 8);
+  return SPAIN_REAL_CLUBS.map((seed, idx) => ({
+    id: makeId("club"),
+    name: seed.name,
+    shortName: seed.shortName,
+    nickname: seed.nickname,
+    country: "Spain",
+    city: seed.city,
+    stadium: seed.stadium,
+    primaryColor: seed.primaryColor,
+    secondaryColor: seed.secondaryColor,
+    badgeId: badges[idx].id,
+    kitId: pick(rng, KIT_TEMPLATES).id,
+    reputation: seed.reputation,
+    budget: seed.budget,
+    weeklyWages: Math.round(seed.budget * 0.018),
+    identity: seed.identity,
+    isUserClub: false,
+  }));
+}
+
 export function buildAiClubs(country: string, rng: RNG): Club[] {
+  if (country === "Spain") return buildSpainClubs(rng);
+
   const style = countryStyle(country);
   const cities = shuffle(rng, style.cities).slice(0, 8);
   const identities = shuffle(rng, IDENTITIES);
